@@ -1,11 +1,13 @@
 import React from "react";
 import { Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DocumentDetail, DocumentItem } from "@/types";
 
 export type ProcessingStage = "uploading" | "reading" | "extracting" | "analyzing" | "ready";
 
 interface ProcessingTimelineProps {
-  currentStage: ProcessingStage;
+  currentStage?: ProcessingStage;
+  document?: DocumentDetail | DocumentItem;
   className?: string;
 }
 
@@ -17,8 +19,32 @@ const STAGES: { key: ProcessingStage; label: string; desc: string }[] = [
   { key: "ready", label: "Ready", desc: "Verification workspace prepared" },
 ];
 
-export function ProcessingTimeline({ currentStage, className }: ProcessingTimelineProps) {
-  const currentIndex = STAGES.findIndex((s) => s.key === currentStage);
+function resolveStage(currentStage?: ProcessingStage, doc?: DocumentDetail | DocumentItem): ProcessingStage {
+  if (currentStage) return currentStage;
+  if (!doc) return "ready";
+  switch (doc.status?.toLowerCase()) {
+    case "uploading":
+      return "uploading";
+    case "pending":
+    case "reading":
+      return "reading";
+    case "processing":
+    case "extracting":
+      return "extracting";
+    case "analyzing":
+      return "analyzing";
+    case "ready":
+    case "processed":
+    case "completed":
+      return "ready";
+    default:
+      return "ready";
+  }
+}
+
+export function ProcessingTimeline({ currentStage, document, className }: ProcessingTimelineProps) {
+  const activeStage = resolveStage(currentStage, document);
+  const currentIndex = STAGES.findIndex((s) => s.key === activeStage);
 
   return (
     <div className={cn("w-full py-4", className)}>
@@ -33,8 +59,8 @@ export function ProcessingTimeline({ currentStage, className }: ProcessingTimeli
         />
 
         {STAGES.map((stage, idx) => {
-          const isDone = idx < currentIndex || currentStage === "ready";
-          const isActive = idx === currentIndex && currentStage !== "ready";
+          const isDone = idx < currentIndex || activeStage === "ready";
+          const isActive = idx === currentIndex && activeStage !== "ready";
           const isPending = idx > currentIndex;
 
           return (

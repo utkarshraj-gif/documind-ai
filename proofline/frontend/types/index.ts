@@ -6,7 +6,8 @@
 export interface User {
   id: string;
   email: string;
-  full_name: string;
+  name: string;
+  full_name?: string;
   created_at: string;
 }
 
@@ -84,8 +85,8 @@ export interface ChatHistory {
 // --- Dashboard ---
 export interface DashboardStats {
   total_documents: number;
-  total_analyses: number;
-  total_chats: number;
+  ready_documents: number;
+  processing_documents: number;
+  total_questions: number;
   recent_documents: DocumentItem[];
-  recent_analyses: DocumentAnalysis[];
 }
