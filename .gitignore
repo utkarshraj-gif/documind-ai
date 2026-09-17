@@ -32,6 +32,9 @@ yarn-error.log*
 .env.production.local
 backend/.env
 frontend/.env.local
+proofline/backend/.env
+proofline/frontend/.env.local
+proofline/backend/storage/
 
 # IDE & OS
 .idea/
